@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی دکمه‌های تصادفی</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #2e3d49;
+            margin-top: 50px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 40px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.5em;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .score, .timer {
+            font-size: 1.5em;
+            margin-top: 30px;
+        }
+        .active {
+            background-color: #ff5733;
+        }
+        .level {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>بازی دکمه‌های تصادفی</h1>
+    <p>کلیک کن روی دکمه‌ای که رنگش تغییر کرده!</p>
+
+    <div class="button-container">
+        <button id="button1">دکمه 1</button>
+        <button id="button2">دکمه 2</button>
+        <button id="button3">دکمه 3</button>
+        <button id="button4">دکمه 4</button>
+    </div>
+
+    <div class="score">
+        <p>امتیاز: <span id="score">0</span></p>
+    </div>
+
+    <div class="timer">
+        <p>زمان باقی‌مانده: <span id="timeLeft">5</span> ثانیه</p>
+    </div>
+
+    <div class="level">
+        <p>سطح: <span id="level">1</span></p>
+    </div>
+
+    <script>
+        let score = 0;
+        let level = 1;
+        let timeLeft = 10;
+        const scoreElement = document.getElementById('score');
+        const timeElement = document.getElementById('timeLeft');
+        const levelElement = document.getElementById('level');
+        const buttons = document.querySelectorAll('button');
+        let activeButton = null;
+        let countdownTimer;
+        let gameTimer;
+
+        function randomizeButtons() {
+            // Clear active state
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Pick a random button
+            activeButton = buttons[Math.floor(Math.random() * buttons.length)];
+            activeButton.classList.add('active');
+        }
+
+        function startGame() {
+            // Start the countdown timer for 5 seconds
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                timeElement.textContent = timeLeft;
+                if (timeLeft === 0) {
+                    clearInterval(countdownTimer);
+                    alert('زمان تمام شد! بازی تمام شد.');
+                    resetGame();
+                }
+            }, 1000);
+
+            // Start randomizing buttons
+            randomizeButtons();
+        }
+
+        function resetGame() {
+            // Reset time and score
+            timeLeft = 5;
+            timeElement.textContent = timeLeft;
+            scoreElement.textContent = score;
+            level = 1;
+            levelElement.textContent = level;
+            buttons.forEach(button => button.disabled = false); // Re-enable buttons
+        }
+
+        function nextLevel() {
+            level++;
+            levelElement.textContent = level;
+            if (level % 2 === 0) { // Every 2 levels, increase button count
+                let newButton = document.createElement('button');
+                newButton.textContent = `دکمه ${buttons.length + 1}`;
+                document.querySelector('.button-container').appendChild(newButton);
+                buttons.push(newButton); // Add new button to buttons array
+            }
+            randomizeButtons();
+            startGame();
+        }
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                if (this === activeButton) {
+                    score++;
+                    scoreElement.textContent = score;
+                    alert('آفرین! امتیاز جدید: ' + score);
+                    nextLevel();  // Proceed to next level
+                } else {
+                    alert('متاسفم، دکمه اشتباه!');
+                    resetGame();  // Reset game if wrong button is clicked
+                }
+            });
+        });
+
+        // Start the game when the page loads
+        window.onload = startGame;
+    </script>
+
+</body>
+</html>
